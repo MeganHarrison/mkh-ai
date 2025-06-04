@@ -96,6 +96,19 @@ def _expand_env(env: Dict[str, str]) -> Dict[str, str]:
     return {k: os.path.expandvars(v) for k, v in env.items()}
 
 
+def _expand_args(args: list[str]) -> list[str]:
+    """Expand environment variables in command arguments."""
+    expanded = []
+    for arg in args:
+        if arg.startswith("$"):
+            var = arg[1:]
+            default = str(Path.cwd()) if var == "LOCAL_FILE_DIR" else ""
+            expanded.append(os.getenv(var, default))
+        else:
+            expanded.append(os.path.expandvars(arg))
+    return expanded
+
+
 def load_subagents() -> Dict[str, Agent]:
     with open(CONFIG_PATH, "r") as fh:
         config = json.load(fh)
@@ -103,7 +116,9 @@ def load_subagents() -> Dict[str, Agent]:
     agents: Dict[str, Agent] = {}
     for name, params in config.get("mcpServers", {}).items():
         env = _expand_env(params.get("env", {}))
-        server = MCPServerStdio(params["command"], params["args"], env=env)
+        server = MCPServerStdio(
+            params["command"], _expand_args(params.get("args", [])), env=env
+        )
         prompt = PROMPTS.get(name, f"You are the {name} specialist.")
         agents[name] = Agent(
             get_model(),

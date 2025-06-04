@@ -11,7 +11,9 @@ backed by Supabase, and Langfuse instrumentation is enabled when the
 1. Create a `.env` file with your API keys and model configuration. Required
    variables include `LLM_API_KEY`, `MODEL_CHOICE`, `DATABASE_URL`, and any
    keys referenced by `mcp_config.json` (e.g. `AIRTABLE_API_KEY`,
-   `BRAVE_API_KEY`, `GITHUB_TOKEN`, `NOTION_TOKEN`, etc.).
+   `BRAVE_API_KEY`, `GITHUB_TOKEN`, `NOTION_TOKEN`, etc.). The optional
+   `LOCAL_FILE_DIR` variable points to the directory that the filesystem MCP
+   server can access. If omitted, the current working directory is used.
 2. Install dependencies and run the interactive CLI:
 
 ```bash
