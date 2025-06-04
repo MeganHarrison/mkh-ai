@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 interface CustomerData {
@@ -14,7 +14,7 @@ interface CustomerData {
 
 export async function addCustomer(formData: FormData) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Extract data from form
     const full_name = formData.get("full_name") as string
