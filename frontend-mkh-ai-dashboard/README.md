@@ -28,3 +28,16 @@ Continue building your app on:
 2. Deploy your chats from the v0 interface
 3. Changes are automatically pushed to this repository
 4. Vercel deploys the latest version from this repository
+
+## Environment Variables
+
+Create a `.env` file in this directory using `.env.example` as a starting point.
+The following variables are used by the dashboard:
+
+- `NEXT_PUBLIC_SUPABASE_URL` – your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` – Supabase anonymous key
+- `OPENAI_API_KEY` – OpenAI API key
+- `API_BEARER_TOKEN` – secret token for authenticated agent requests
+- `WEBHOOK_API_KEY` – optional n8n webhook key
+- `documentation_agent_key` – Documentation Agent API key
+- `AGENT_BASE_URL` – base URL for the MCP agent API (defaults to `http://localhost:8001`)

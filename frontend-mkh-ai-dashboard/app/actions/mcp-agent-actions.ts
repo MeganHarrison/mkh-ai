@@ -34,7 +34,8 @@ export async function sendMCPAgentRequest(message: string, userId: string, sessi
       session_id: sessionId
     }
 
-    const response = await fetch("http://localhost:8001/api/mcp-agent-army", {
+    const baseUrl = process.env.AGENT_BASE_URL || "http://localhost:8001"
+    const response = await fetch(`${baseUrl}/api/mcp-agent-army`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
