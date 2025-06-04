@@ -1,6 +1,6 @@
 import { DataTable } from "@/components/data-table"
 import { PageHeader } from "@/components/page-header"
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { AddCustomerButton } from "@/components/add-customer-button"
@@ -86,7 +86,7 @@ export default async function CustomersPage() {
 
   try {
     // Connect to Supabase and fetch real customers data
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { data, error: supabaseError } = await supabase
       .from("customers")

@@ -1,6 +1,6 @@
 import { DataTable } from "@/components/data-table"
 import { PageHeader } from "@/components/page-header"
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { AddContactButton } from "@/components/add-contact-button"
@@ -42,7 +42,7 @@ export default async function CrmPage() {
   let error: any = null
 
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     if (!supabase) {
       throw new Error("Failed to initialize Supabase client")
