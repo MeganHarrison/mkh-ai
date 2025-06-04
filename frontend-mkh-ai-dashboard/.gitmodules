@@ -1,0 +1,3 @@
+[submodule "agent-army"]
+	path = agent-army
+	url = https://github.com/MeganHarrison/ai-agents.git
