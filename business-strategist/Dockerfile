@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 8001
 
-CMD ["python", "business_strategist.py"]
+CMD ["uvicorn", "business_strategist_endpoint:app", "--host", "0.0.0.0", "--port", "8001"]
