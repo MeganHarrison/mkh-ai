@@ -8,7 +8,7 @@ import os
 from contextlib import AsyncExitStack
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Iterable
+from typing import Dict
 
 from dotenv import load_dotenv
 from rich.console import Console
@@ -24,30 +24,32 @@ from pydantic_ai.providers.openai import OpenAIProvider
 # Optional Langfuse instrumentation
 try:
     from configure_langfuse import configure_langfuse
-except Exception:  # pragma: no cover - optional dependency
+except ImportError:  # pragma: no cover - optional dependency
     import importlib.util
 
-    module_path = Path(__file__).resolve().parent.parent / "pydantic-ai-langfuse" / "configure_langfuse.py"
-    spec = importlib.util.spec_from_file_location("configure_langfuse", module_path)
-    if spec and spec.loader:
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        configure_langfuse = module.configure_langfuse  # type: ignore
-    else:  # pragma: no cover - fallback when file missing
-        def configure_langfuse():
-            return None
+    module_path = Path(__file__).resolve().parent / "pydantic-ai-langfuse" / "configure_langfuse.py"
+    if module_path.is_file():
+        spec = importlib.util.spec_from_file_location("configure_langfuse", module_path)
+        if spec and spec.loader:
+            module = importlib.util.module_from_spec(spec)
+            try:  # pragma: no cover - best effort import
+                spec.loader.exec_module(module)  # type: ignore[attr-defined]
+                configure_langfuse = module.configure_langfuse  # type: ignore
+            except Exception:
+                configure_langfuse = lambda: None
+        else:
+            configure_langfuse = lambda: None
+    else:
+        configure_langfuse = lambda: None
 
-env_path = Path(__file__).parent / ".env"
-print("Loading .env from:", env_path)
-load_dotenv(dotenv_path=env_path)
-print("AIRTABLE_API_KEY loaded:", os.getenv("AIRTABLE_API_KEY"))
-
+load_dotenv()
 
 # ---------------------------------------------------------------------------
 # Model and memory setup
 # ---------------------------------------------------------------------------
 
 def get_model() -> OpenAIModel:
+    """Return the configured OpenAI model."""
     llm = os.getenv("MODEL_CHOICE", "gpt-4o-mini")
     base_url = os.getenv("BASE_URL", "https://api.openai.com/v1")
     api_key = os.getenv("LLM_API_KEY", "")
@@ -114,7 +116,6 @@ def load_subagents() -> Dict[str, Agent]:
 
 sub_agents = load_subagents()
 
-
 # Primary orchestrator
 instrument = os.getenv("ENABLE_LANGFUSE", "false").lower() == "true"
 tracer = configure_langfuse() if instrument else None
@@ -146,6 +147,7 @@ for _name, _agent in sub_agents.items():
 
 async def run_cli() -> None:
     """Run the orchestrator in an interactive loop."""
+
     print("Business Strategist Orchestrator")
     print("Enter 'exit' to quit the program.")
 
