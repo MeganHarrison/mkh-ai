@@ -65,7 +65,7 @@ export function Sidebar() {
     },
     {
       icon: Pencil,
-      label: "Content",
+      label: "Content Lab",
       href: "/content",
     },
     {

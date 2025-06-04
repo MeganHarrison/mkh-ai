@@ -51,6 +51,36 @@ export async function askAI(question: string, history: Message[]) {
   }
 }
 
+export async function askContentLabAgent(question: string, history: Message[]) {
+  try {
+    const openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY,
+    })
+
+    const messages = [
+      {
+        role: "system",
+        content:
+          "You are the Content Lab AI agent. Help users brainstorm, plan, write and repurpose content.",
+      },
+      ...history.map((msg) => ({ role: msg.role, content: msg.content })),
+      { role: "user", content: question },
+    ]
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: messages as any,
+      temperature: 0.7,
+      max_tokens: 500,
+    })
+
+    return response.choices[0].message.content || "I'm not sure how to respond to that."
+  } catch (error) {
+    console.error("Error in askContentLabAgent:", error)
+    return "Sorry, I encountered an error processing your request."
+  }
+}
+
 export async function getProductsData() {
   const supabase = createClient()
 
@@ -112,7 +142,7 @@ export async function getTableInfo(tableName: string) {
       columns: ["id", "title", "content", "author_id", "created_at"],
       primaryKey: "id",
     },
-    content: {
+    content_ideas: {
       columns: ["id", "title", "body", "status", "author_id", "created_at"],
       primaryKey: "id",
     },
