@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import OpenAI from "openai"
 
 type Message = {
@@ -15,7 +15,7 @@ export async function askAI(question: string, history: Message[]) {
       apiKey: process.env.OPENAI_API_KEY,
     })
 
-    const supabase = createClient()
+    const supabase = await createClient()
 
     // Format the conversation history for OpenAI
     const messages = [
@@ -52,7 +52,7 @@ export async function askAI(question: string, history: Message[]) {
 }
 
 export async function getProductsData() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   try {
     const { data, error } = await supabase.from("products").select("*").order("created_at", { ascending: false })
@@ -67,7 +67,7 @@ export async function getProductsData() {
 }
 
 export async function getProductById(id: number) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   try {
     const { data, error } = await supabase.from("products").select("*").eq("id", id).single()
@@ -82,7 +82,7 @@ export async function getProductById(id: number) {
 }
 
 export async function getTableData(tableName: string) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   try {
     const { data, error } = await supabase.from(tableName).select("*").limit(100)
