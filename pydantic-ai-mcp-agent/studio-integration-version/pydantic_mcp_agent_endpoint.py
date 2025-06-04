@@ -19,11 +19,29 @@ from pydantic_ai.messages import (
 )
 
 from pydantic_mcp_agent import get_pydantic_ai_agent
+from mem0 import Memory
 
 # Load environment variables
 load_dotenv()
 
 mcp_agent = None
+
+mem0_config = {
+    "llm": {
+        "provider": "openai",
+        "config": {
+            "model": os.getenv("MODEL_CHOICE", "gpt-4o-mini")
+        }
+    },
+    "vector_store": {
+        "provider": "supabase",
+        "config": {
+            "connection_string": os.environ["DATABASE_URL"],
+            "collection_name": "memories"
+        }
+    }
+}
+mem0_memory = Memory.from_config(mem0_config)
 
 # Define a lifespan context manager
 @asynccontextmanager
@@ -128,6 +146,10 @@ async def pydantic_mcp_agent(
             msg = ModelRequest(parts=[UserPromptPart(content=msg_content)]) if msg_type == "human" else ModelResponse(parts=[TextPart(content=msg_content)])
             messages.append(msg)
 
+        # Retrieve relevant memories with Mem0
+        relevant_memories = mem0_memory.search(query=request.query, user_id=request.user_id, limit=3)
+        memories_str = "\n".join(f"- {entry['memory']}" for entry in relevant_memories["results"])
+        
         # Store user's query
         await store_message(
             session_id=request.session_id,
@@ -135,9 +157,12 @@ async def pydantic_mcp_agent(
             content=request.query
         )        
 
-        # Run the agent with conversation history
+        # Run the agent with conversation history and memories
+        # Inject memories_str into the prompt if your agent supports system/context prompts
+        # For demonstration, prepend memories_str to the user query
+        agent_input = f"User Memories:\n{memories_str}\n\nUser Query: {request.query}" if memories_str else request.query
         result = await mcp_agent.run(
-            request.query,
+            agent_input,
             message_history=messages
         )
 
@@ -154,6 +179,7 @@ async def pydantic_mcp_agent(
             {"role": "user", "content": request.query},
             {"role": "assistant", "content": result.data}
         ]   
+        mem0_memory.add(memory_messages, user_id=request.user_id)
 
         return AgentResponse(success=True)
 
