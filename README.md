@@ -1,46 +1,187 @@
-# What is the Live Agent Studio?
+# Next Level AI Agents
 
-The [Live Agent Studio](https://studio.ottomator.ai) is a community-driven platform developed by [oTTomator](https://ottomator.ai) for you to explore cutting-edge AI agents and learn how to implement them for yourself or your business! All agents on this platform are open source and, over time, will cover a very large variety of use cases.
+## Objective
 
-The goal with the studio is to build an educational platform for you to learn how to do incredible things with AI, while still providing practical value so that you’ll want to use the agents just for the sake of what they can do for you!
+Create a visually beautiful, intuitive, and high-functioning front-end interface designed for a powerful suite of AI agents. This app should make interacting with your AI assistant seamless, personalized, and delightful across business workflows, content creation, and technical documentation.
 
-This platform is still in beta – expect longer response times under load, a rapidly growing agent library over the coming months, and a lot more content on this platform soon on Cole Medin’s YouTube channel!
+## Core UX Requirements
 
-# What is this Repository for?
+- Sleek, clean UI optimized for both mobile and desktop
+- Supabase authentication
+- Light/dark theme toggle
+- Sidebar navigation that collapses to icons
+- Structured chat display (bubbles, cards, or clean layout with headings)
+- Sticky input bar for sending messages
+- Typing animation and AI response fade-in
+- Smooth transition effects
 
-This repository contains the source code/workflow JSON for all the agents on the Live Agent Studio! Every agent being added to the platform is currently be open sourced here so we can not only create a curated collection of cutting-edge agents together as a community, but also learn from one another!
+## Interface Pages
 
-## Tokens
+**Dashboard**
 
-Most agents on the Live Agent Studio cost tokens to use, which are purchasable on the platform. However, when you first sign in you are given some tokens to start so you can use the agents free of charge! The biggest reason agents cost tokens is that we pay for the LLM usage since we host all the agents developed by you and the rest of the community!
+**Agents**
 
-[Purchase Tokens](https://studio.ottomator.ai/pricing)
+1. **Business Strategist** (RAG Supabase vector store and MCP servers with multi-agent orchestration)
+2. **Documentation Agent** (Use Crawl4ai to scrape urls and add to Supabase vector store)
+3. **Content Lab**
+4. **Lead Generation and Sales Agent**
 
-## Future Plans
+**Database Pages**
 
-As the Live Agent Studio develops, it will become the go-to place to stay on top of what is possible with AI agents! Anytime there is a new AI technology, groundbreaking agent research, or a new tool/library to build agents with, it’ll be featured through agents on the platform. It’s a tall order, but we have big plans for the oTTomator community, and we’re confident we can grow to accomplish this!
+1. Products + Services
+2. Customers
+3. Sales
+4. Content Library
+5. Projects
 
-## FAQ
+**Additional Pages**
 
-### I want to build an agent to showcase in the Live Agent Studio! How do I do that?
+1. Login
+2. Create Account
+3. Forgot Password
+4. Account
 
-Head on over here to learn how to build an agent for the platform:
+## MCP Servers
 
-[Developer Guide](https://studio.ottomator.ai/guide)
+- **Supabase**: Store all user data, content ideas, and embedded documentation
+- Mem0
+- Tavily
+- Notion
+- Slack
+- Github
+- BraveSearch
+- YouTube
+- **n8n**: Webhook for intelligent agent responses
 
-Also check out [the sample n8n agent](~sample-n8n-agent~) for a starting point of building an n8n agent for the Live Agent Studio, and [the sample Python agent](~sample-python-agent~) for Python.
+## Platforms
 
-### How many tokens does it cost to use an agent?
+### Frontend Platforms
 
-Each agent will charge tokens per prompt. The number of tokens depends on the agent, as some agents use larger LLMs, some call LLMs multiple times, and some use paid APIs.
+- NextJS
+- Tailwind
+- Shadcn UI
+- Supabase UI Library
+- Vercel
 
-### Where can I go to talk about all these agents and get help implementing them myself?
+### Backend Platforms
 
-Head on over to our Think Tank community and feel free to make a post!
+- Pydantic AI
+- Langchain
+- Langfuse
+- Zapier
+- Mem0
 
-[Think Tank Community](https://thinktank.ottomator.ai)
+## **Core Architecture**
 
----
+**Frontend**:
 
-&copy; 2024 Live Agent Studio. All rights reserved.  
-Created by oTTomator
+- **Framework**: Next.js (with App Router)
+- **Auth**: Supabase Auth
+- **State Management**: React (for agent/task state)
+- **Styling/UI**: Tailwind CSS + ShadCN UI (or similar)
+
+**Backend/API Layer**:
+
+- **Edge Functions or Next.js API Routes** for routing requests to agents
+- **Supabase**: Postgres DB + Edge Functions + Vector Store (pgvector)
+- **Agent Backends**: Python (FastAPI or LangChain) agents deployed as services
+
+**Data Stores**:
+
+- **Supabase Tables**: Users, Business Data, Project Management, etc.
+- **Supabase Vector Store**: For RAG-style queries per business
+- **Notion API**: For 2-way sync with Supabase (periodic CRON or Webhooks)
+
+### **Tech Stack**
+
+| **Layer** | **Tool** |
+| --- | --- |
+| Frontend | Next.js, Tailwind, React |
+| Auth | Supabase Auth |
+| Database | Supabase Postgres |
+| Vector Store | Supabase pgvector |
+| AI Agents | Python, Pydantic AI, or OpenAI + LangChain/CrewAI |
+| Integration APIs | Notion, WordPress REST, Crawl4AI |
+| Hosting | Vercel (Frontend), Railway/Fly.io/Digital Ocean/Render (Agents) |
+
+## **Foundational Setup**
+
+1. **Auth & Dashboard**
+    - Set up Supabase Auth (email/password or OAuth)
+    - Build a protected dashboard route in Next.js
+    - Create basic Supabase tables: users, business_docs, projects, leads, etc.
+2. **Embedding & Vector Search**
+    - Use OpenAI or another model to embed uploaded docs
+    - Store embeddings in pgvector in Supabase
+    - Build a basic chat interface powered by an agent that queries these embeddings
+3. **CRUD Interface**
+    - Use Supabase client to pull/display tables (e.g., products, leads)
+    - Build simple UI to add/delete/update records (admin dashboard)
+
+### Dashboard Homepage
+
+- 3-column grid of cards for:
+    - Business Strategist Agent Chat
+    - Documentation Expert Chat
+    - Content Lab
+    - Copywriting Agent
+    - Sales Agent
+    - Databases
+- Each card = icon, short description, CTA button
+
+### Business Strategist Chat (RAG with Multi-Agent Orchestration)
+
+**Agent Orchestration & Tools**
+
+- Introduce tool routing (e.g., via LangChain’s AgentExecutor or Autogen roles):
+- Use routing logic:
+    - Strategy Agent decides what other agent(s) to delegate to
+    - Chain-of-Thought reasoning or tool selection tree
+- Agent uses:
+    - Supabase RAG context retrieval
+    - Access to CRUD layer
+    - Tools like NotionTool, WordPressTool
+    - Mem0 or similar tool for long-term memory
+- Chat interface
+- Display chat history in secondary sidebar
+- Expose via API /api/agents/strategy
+- Use webhook to connect with n8n workflow: `https://agents.nextlevelaiagents.com/webhook/chat`
+- POST JSON input with `chat_input` and `session_id`
+- Display structured responses
+- Button to add additional files to vector store (documents table)
+
+### Documentation Expert Chat (RAG)
+
+- AI agent with same chat format - uses “crawled-pages” Supabase table as the vector store
+- Connect to endpoint for ai agent
+- Feature: **Add Documentation**
+    - Form: name + sitemap URL
+    - Show progress bar during backend process
+    - Notify: "Documentation added."
+    - Tooltip for "Instructions"
+
+### Content Lab
+
+- Supabase Table (connect to `content_ideas` table)
+    - Display tables in horizontal tabs based on status (Idea, Production, Published)
+- Actions: Add new, Edit, Delete
+- Chat interface at the bottom of the page connected to the Content Lab Agent
+- Edit page: Pull Supabase row details into full page view
+
+### **Notion Sync & Project Management Agent**
+
+- Sync Notion DB → Supabase via:
+    - CRON Job (serverless function or background worker)
+    - Webhook listener (if supported)
+- Project Manager agent gets:
+    - Project deadlines
+    - Milestones
+    - Can send updates via Notion comments, Slack, or email
+
+### LeadGenAgent: web scraper or CRM connector
+
+### Account Page
+
+- User avatar
+- Change name/email/password/profile
+- API Key input field (saved per user session)
