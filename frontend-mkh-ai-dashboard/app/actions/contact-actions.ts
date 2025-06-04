@@ -1,6 +1,6 @@
 "use server"
 
-import { createClient } from "@/utils/supabase/server"
+import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
 interface ContactData {
@@ -11,7 +11,7 @@ interface ContactData {
 
 export async function addContact(formData: FormData) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const name = formData.get("name") as string
     const email = (formData.get("email") as string) || null
     const phone = (formData.get("phone") as string) || null
@@ -47,7 +47,7 @@ export async function addContact(formData: FormData) {
 
 export async function updateContact(id: string, formData: FormData) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const name = formData.get("name") as string
     const email = (formData.get("email") as string) || null
     const phone = (formData.get("phone") as string) || null
@@ -79,7 +79,7 @@ export async function updateContact(id: string, formData: FormData) {
 
 export async function deleteContact(id: string) {
   try {
-    const supabase = createClient()
+    const supabase = await createClient()
     const { error } = await supabase.from("contacts").delete().eq("id", id)
 
     if (error) {
