@@ -115,9 +115,17 @@ def load_subagents() -> Dict[str, Agent]:
 
     agents: Dict[str, Agent] = {}
     for name, params in config.get("mcpServers", {}).items():
+        command = params.get("command")
+        if command is None:
+            raise ValueError(
+                f'Missing "command" for MCP server "{name}" in {CONFIG_PATH}'
+            )
+
         env = _expand_env(params.get("env", {}))
         server = MCPServerStdio(
-            params["command"], _expand_args(params.get("args", [])), env=env
+            command,
+            _expand_args(params.get("args", [])),
+            env=env,
         )
         prompt = PROMPTS.get(name, f"You are the {name} specialist.")
         agents[name] = Agent(
